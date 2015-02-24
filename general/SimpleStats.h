@@ -28,16 +28,18 @@
 class RunningStat
 {
 public:
-    RunningStat() : m_n(0), m_oldM(0), m_newM(0), m_oldS(0), m_newS(0) {}
+    RunningStat() : m_n(0), m_sum(0), m_oldM(0), m_newM(0), m_oldS(0), m_newS(0){}
 
     void Clear()
     {
         m_n = 0;
+        m_sum = 0;
     }
 
     void Push(double x)
     {
         m_n++;
+        m_sum += trunc(x);
 
         // See Knuth TAOCP vol 2, 3rd edition, page 232
         if (m_n == 1)
@@ -63,6 +65,11 @@ public:
         return m_n;
     }
 
+    uint64_t Sum() const
+    {
+        return m_sum;
+    }
+
     double Mean() const
     {
         return (m_n > 0) ? m_newM : 0.0;
@@ -79,7 +86,7 @@ public:
     }
 
 private:
-    uint64_t m_n;
+    uint64_t m_n, m_sum;
     double m_oldM, m_newM, m_oldS, m_newS;
 };
 
@@ -95,7 +102,9 @@ inline std::ostream &operator << (std::ostream &stream, RunningStat &s)
 {
     stream  << "N: " << s.NumDataValues()
     << " Mean: " << s.Mean()
-    << " Standard Deviation: " << s.StandardDeviation();
+    << " Standard Deviation: " << s.StandardDeviation()
+    << " Sum: " << s.Sum()
+;
 
     return stream;
 }
